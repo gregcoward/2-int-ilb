@@ -140,10 +140,10 @@
             "Name": "data1-http-80",
             "properties": {
               "frontendIPConfiguration": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data1')]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data')]"
               },
               "backendAddressPool": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/backendAddressPools/loadBalancerBackEnd-data1')]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/backendAddressPools/loadBalancerBackEnd-data')]"
               },
               "probe": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/probes/tcp-80')]"
@@ -158,10 +158,10 @@
             "Name": "data1-http-443",
             "properties": {
               "frontendIPConfiguration": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data1')]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data')]"
               },
               "backendAddressPool": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/backendAddressPools/loadBalancerBackEnd-data1')]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/backendAddressPools/loadBalancerBackEnd-data')]"
               },
               "probe": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/probes/tcp-443')]"
