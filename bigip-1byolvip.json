@@ -164,7 +164,7 @@
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/backendAddressPools/loadBalancerBackEnd-data')]"
               },
               "probe": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/probes/tcp-443')]"
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/probes/tcp-8443')]"
               },
               "protocol": "Tcp",
               "frontendPort": 443,
