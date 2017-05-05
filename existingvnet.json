@@ -32,34 +32,10 @@
         "description": "Name of mgmt Subnet"
       }
     },
-    "mgmtSubnetAddressPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Address Prefix for mgmt Subnet"
-      }
-    },
     "intSubnetName": {
       "type": "string",
       "metadata": {
         "description": "Name of internal facing Subnet"
-      }
-    },
-    "intSubnetAddressPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Address Prefix for internal facing Subnet"
-      }
-    },
-    "extSubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of public-facing Subnet"
-      }
-    },
-    "extSubnetAddressPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Address Prefix for public-facing Subnet"
       }
     },
     "vnetExistingRGName": {
