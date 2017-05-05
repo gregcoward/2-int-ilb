@@ -452,7 +452,6 @@
           "location": { "value": "[variables('location')]" },
           "licenseKey1": { "value": "[parameters('licenseKey1')]" },
           "licenseKey2": { "value": "[parameters('licenseKey2')]" },
-          "instanceType": { "value": "[parameters('instanceType')]" },
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[parameters('adminPassword')]" },
           "loadBalancerName": { "value": "[variables('loadbalancerName')]" },
