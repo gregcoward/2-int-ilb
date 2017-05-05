@@ -334,7 +334,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('f5NamePrefix'),'1','/start')]",
+      "name": "[concat(parameters('f5NamePrefix'),'-1','/start')]",
       "apiVersion": "[parameters('apiVersionCompute')]",
       "location": "[parameters('location')]",
       "dependsOn": [
