@@ -137,7 +137,7 @@
         ],
         "loadBalancingRules": [
           {
-            "Name": "data1-http-80",
+            "Name": "data-http-80",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data')]"
@@ -155,7 +155,7 @@
             }
           },
           {
-            "Name": "data1-http-443",
+            "Name": "data-http-443",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat(parameters('loadBalancerName'),'-data')), '/frontendIpConfigurations/loadBalancerFrontEnd-data')]"
