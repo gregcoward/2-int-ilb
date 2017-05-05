@@ -146,13 +146,6 @@
       "metadata": {
         "description": "Specify the IP address to assign to the frontend of the ILB object"
       }
-    },
-    "restrictedSrcAddress": {
-      "type": "string",
-      "defaultValue": "*",
-      "metadata": {
-        "description": "Restricts management access to a specific network or address. Enter a IP address or address range in CIDR notation, or asterisk for all sources."
-      }
     }
   },
   "variables": {
