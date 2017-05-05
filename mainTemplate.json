@@ -2,14 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "byolOrHourly": {
-      "type": "string",
-      "defaultValue": "hourly",
-      "allowedValues": [ "hourly", "byol" ],
-      "metadata": {
-        "description": "The number of Web Application Firewalls that will be deployed in front of your application."
-      }
-    },
     "numberOfInstances": {
       "type": "int",
       "defaultValue": 1,
@@ -49,30 +41,6 @@
       },
       "type": "string"
     },
-    "imageName": {
-      "allowedValues": [
-        "good",
-        "better",
-        "best"
-      ],
-      "defaultValue": "good",
-      "metadata": {
-        "description": "F5 SKU(IMAGE) to Deploy, only relevant for hourly billing."
-      },
-      "type": "string"
-    },
-    "licensedBandwidth": {
-      "type": "string",
-      "defaultValue": "200m",
-      "metadata": {
-        "description": "The VM image to use for this deployment, only relevant for hourly billing."
-      },
-      "allowedValues": [
-        "1g",
-        "25m",
-        "200m"
-      ]
-    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "azureuser",
@@ -86,11 +54,11 @@
         "description": "Password to login to the Web Application Firewall."
       }
     },
-    "publicIpName": {
+    "bigipNamePrefix": {
       "type": "string",
-      "defaultValue": "ip01",
+      "defaultValue": "bigip",
       "metadata": {
-        "description": "Unique name for the Public IP used to access the Web Application Firewalls for management."
+        "description": "Specify the name prefix of th BIG-IP(s)."
       }
     },
     "licenseKey1": {
@@ -107,20 +75,11 @@
         "description": "The license token for the second F5 BYOL instance, (if applicable)."
       }
     },
-    "numCopies": {
-      "type": "int",
-      "defaultValue": 1,
-      "allowedValues": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
-      "maxValue": 5,
-      "minValue": 1,
+    "vnetExistingRGName": {
+      "type": "string",
+      "defaultValue": "",
       "metadata": {
-        "description": "The number of VS private/public IP combos to deploy for purposes of public facing virtuals ( 1 - 5)."
+        "description": "Name of Azure resource group where existing Virtual Network resides; REQUIRED if using existing VNET."
       }
     },
     "vnetName": {
@@ -151,6 +110,18 @@
         "description": "Specify the virtual subnet address space."
       }
     },
+    "mgmtIPAddress1": {
+      "type": "string",
+      "metadata": {
+        "description": "Specify the IP address to assign to the first BIG-IP's management interface."
+      }
+    },
+    "mgmtIPAddress2": {
+      "type": "string",
+      "metadata": {
+        "description": "Specify the IP address to assign to the second BIG-IP's management interface."
+      }
+    },
     "intSubnetName": {
       "type": "string",
       "defaultValue": "internal",
@@ -158,40 +129,29 @@
         "description": "Specify the virtual subnet name wher the BIG-IP will reside."
       }
     },
-    "intSubnetAddressPrefix": {
+    "intIPAddress1": {
       "type": "string",
-      "defaultValue": "10.10.2.0/24",
       "metadata": {
-        "description": "Specify the virtual subnet address space."
+        "description": "Specify the IP address to assign to the first BIG-IP's internal interface."
       }
     },
-    "extSubnetName": {
+    "intIPAddress2": {
       "type": "string",
-      "defaultValue": "external",
       "metadata": {
-        "description": "Specify the virtual subnet name wher the BIG-IP will reside."
+        "description": "Specify the IP address to assign to the second BIG-IP's internal interface."
       }
     },
-    "extSubnetAddressPrefix": {
+    "ilbSubnetName": {
       "type": "string",
-      "defaultValue": "10.10.3.0/24",
+      "defaultValue": "application",
       "metadata": {
-        "description": "Specify the virtual subnet address space."
+        "description": "Specify the virtual subnet name where the ILB frontend will be associated"
       }
     },
-    "vnetNewOrExisting": {
+    "ilbIPAddress": {
       "type": "string",
-      "defaultValue": "new",
-      "allowedValues": ["new", "existing"],
       "metadata": {
-        "description": "New or Existing Virtual Network"
-      }
-    },
-    "vnetExistingRGName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Existing Virtual Network name"
+        "description": "Specify the IP address to assign to the frontend of the ILB object"
       }
     },
     "restrictedSrcAddress": {
@@ -204,29 +164,26 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "vnetNewOrExisting": "existing",
     "bigIpVersion": "latest",
     "baseUrl": "https://raw.githubusercontent.com/gregcoward/multinic-multivip/master",
     "newStorageAccountName": "[concat(uniquestring(concat(resourceGroup().id, 'st')), 'st')]",
     "diagStorageAccountName": "[concat(uniquestring(concat(resourceGroup().id, 'diag')), 'diag')]",
-    "f5NamePrefix": "[concat(parameters('publicIpName'),'-bigip')]",
+    "f5NamePrefix": "[parameters('bigipNamePrefix')]",
     "apiVersionCompute": "2016-03-30",
     "apiVersionNetwork": "2015-06-15",
     "apiVersionStorage": "2015-06-15",
     "apiVersionTemplate": "2015-01-01",
     "pubIpTemplateLink": "[concat(variables('baseUrl'), '/publicips.json')]",
     "loadBalTemplateLink": "[concat(variables('baseUrl'), '/loadBals.json')]",
-    "bigipTemplateLink": "[concat(variables('baseUrl'), '/bigip-',parameters('numberOfInstances'),parameters('byolOrHourly'), parameters('numCopies'), 'vip.json')]",
-    "vnetLink": "[concat(variables('baseUrl'),'/',parameters('vnetNewOrExisting'),'vnet.json')]",
-    "mgmtIpAddress": "10.10.1.",
+    "bigipTemplateLink": "[concat(variables('baseUrl'), '/bigip-',parameters('numberOfInstances'),'byolvip.json')]",
+    "vnetLink": "[concat(variables('baseUrl'),'/',variables('vnetNewOrExisting'),'vnet.json')]",
     "mgmtsubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('mgmtSubnetName'))]",
-    "intIpAddress": "10.10.2.",
     "intsubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('intSubnetName'))]",
-    "extIpAddress": "10.10.3.",
-    "extsubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('extSubnetName'))]",
-    "nicNamePrefix": "[concat(parameters('publicIpName'),'-nic')]",
-    "loadBalancerName": "[concat(parameters('publicIpName'),'-lb')]",
-    "availabilitySetName": "[concat(parameters('publicIpName'),'-as')]",
-    "nsgID": "[resourceId('Microsoft.Network/networkSecurityGroups/',concat(parameters('publicIpName'),'-nsg'))]",
+    "ilbsubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('ilbSubnetName'))]",
+    "nicNamePrefix": "[concat(parameters('bigipNamePrefix'),'-nic')]",
+    "loadBalancerName": "[concat(parameters('bigipNamePrefix'),'-lb')]",
+    "availabilitySetName": "[concat(parameters('bigipNamePrefix'),'-as')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnetName'))]",
     "instanceTypeMap": {
       "Standard_A3": {
@@ -463,98 +420,6 @@
       "type": "Microsoft.Compute/availabilitySets"
     },
     {
-      "apiVersion": "[variables('apiVersionNetwork')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[concat(parameters('publicIpName'), '-nsg')]",
-      "location": "[variables('location')]",
-      "tags": {
-        "displayName": "NetworkSecurityGroup"
-      },
-      "properties": {
-        "securityRules": [
-          {
-            "name": "mgmt_allow_8443",
-            "properties": {
-              "description": "",
-              "priority": 101,
-              "sourceAddressPrefix": "[parameters('restrictedSrcAddress')]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "8443",
-              "protocol": "TCP",
-              "direction": "Inbound",
-              "access": "Allow"
-            }
-          },
-          {
-            "name": "ssh_allow_22",
-            "properties": {
-              "description": "",
-              "priority": 102,
-              "sourceAddressPrefix": "[parameters('restrictedSrcAddress')]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "22",
-              "protocol": "TCP",
-              "direction": "Inbound",
-              "access": "Allow"
-            }
-          },
-          {
-            "name": "app_allow_80",
-            "properties": {
-              "description": "",
-              "priority": 103,
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "80",
-              "protocol": "TCP",
-              "direction": "Inbound",
-              "access": "Allow"
-            }
-          },
-          {
-            "name": "app_allow_443",
-            "properties": {
-              "description": "",
-              "priority": 104,
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "443",
-              "protocol": "TCP",
-              "direction": "Inbound",
-              "access": "Allow"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "[variables('apiVersionTemplate')]",
-      "name": "publicIpLinkedTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "dependsOn": [
-      ],
-      "properties": {
-        "mode": "incremental",
-        "templateLink": {
-          "uri": "[variables('pubIpTemplateLink')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "apiVersionCompute": { "value": "[variables('apiVersionCompute')]" },
-          "apiVersionNetwork": { "value": "[variables('apiVersionNetwork')]" },
-          "apiVersionStorage": { "value": "[variables('apiVersionStorage')]" },
-          "numCopies": { "value": "[parameters('numCopies')]" },
-          "numberOfInstances": { "value": "[parameters('numberOfInstances')]" },
-          "location": { "value": "[variables('location')]" },
-          "publicIPName": { "value": "[parameters('publicIPName')]" }
-        }
-      }
-    },
-    {
       "apiVersion": "[variables('apiVersionTemplate')]",
       "name": "linkedTemplate",
       "type": "Microsoft.Resources/deployments",
@@ -562,7 +427,6 @@
         "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('newStorageAccountName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('diagStorageAccountName'))]",
-        "publicIpLinkedTemplate",
         "virtualNetworkTemplate"
       ],
       "properties": {
@@ -573,16 +437,17 @@
         },
         "parameters": {
           "f5NamePrefix": { "value": "[variables('f5NamePrefix')]" },
-          "mgmtIpAddress": { "value": "[variables('mgmtIpAddress')]" },
-          "intIpAddress": { "value": "[variables('intIpAddress')]" },
-          "extIpAddress": { "value": "[variables('extIpAddress')]" },
+          "instanceType": { "value": "parameters('instanceType')]" },
+          "mgmtIPAddress1": { "value": "[parameters('mgmtIPAddress1')]" },
+          "mgmtIPAddress2": { "value": "[parameters('mgmtIPAddress2')]" },
+          "intIPAddress1": { "value": "[parameters('intIPAddress1')]" },
+          "intIPAddress2": { "value": "[parameters('intIPAddress2')]" },
+          "ilbIPAddress": { "value": "[parameters('ilbIPAddress')]" },
           "nicNamePrefix": { "value": "[variables('nicNamePrefix')]" },
-          "nsgID": { "value": "[variables('nsgID')]" },
           "apiVersionCompute": { "value": "[variables('apiVersionCompute')]" },
           "apiVersionNetwork": { "value": "[variables('apiVersionNetwork')]" },
           "apiVersionStorage": { "value": "[variables('apiVersionStorage')]" },
           "numberOfInstances": { "value": "[parameters('numberOfInstances')]" },
-          "numCopies": { "value": "[parameters('numCopies')]" },
           "baseUrl": { "value": "[variables('baseUrl')]" },
           "location": { "value": "[variables('location')]" },
           "licenseKey1": { "value": "[parameters('licenseKey1')]" },
@@ -591,16 +456,14 @@
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[parameters('adminPassword')]" },
           "loadBalancerName": { "value": "[variables('loadbalancerName')]" },
-          "publicIPName": { "value": "[parameters('publicIPName')]" },
+          "bigipNamePrefix": { "value": "[parameters('bigipNamePrefix')]" },
           "virtualNetworkName": { "value": "[parameters('vnetName')]" },
           "availabilitySetName": { "value": "[variables('availabilitySetName')]" },
           "newStorageAccountName": { "value": "[variables('newStorageAccountName')]" },
           "diagStorageAccountName": { "value": "[variables('diagStorageAccountName')]" },
-          "imageName": { "value": "[parameters('imageName')]" },
-          "licensedBandwidth": { "value": "[parameters('licensedBandwidth')]" },
           "mgmtSubnetRef": { "value": "[concat(reference('virtualNetworkTemplate').outputs.vnetID.value,'/subnets/',parameters('mgmtSubnetName'))]" },
           "intSubnetRef": { "value": "[concat(reference('virtualNetworkTemplate').outputs.vnetID.value,'/subnets/',parameters('intSubnetName'))]" },
-          "extSubnetRef": { "value": "[concat(reference('virtualNetworkTemplate').outputs.vnetID.value,'/subnets/',parameters('extSubnetName'))]" }
+          "ilbSubnetRef": { "value": "[concat(reference('virtualNetworkTemplate').outputs.vnetID.value,'/subnets/',parameters('ilbSubnetName'))]" }
         }
       }
     }
