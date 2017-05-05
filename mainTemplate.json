@@ -159,7 +159,7 @@
     "location": "[resourceGroup().location]",
     "vnetNewOrExisting": "existing",
     "bigIpVersion": "latest",
-    "baseUrl": "https://raw.githubusercontent.com/gregcoward/multinic-multivip/master",
+    "baseUrl": "https://raw.githubusercontent.com/gregcoward/2-int-ilb/master",
     "newStorageAccountName": "[concat(uniquestring(concat(resourceGroup().id, 'st')), 'st')]",
     "diagStorageAccountName": "[concat(uniquestring(concat(resourceGroup().id, 'diag')), 'diag')]",
     "f5NamePrefix": "[parameters('bigipNamePrefix')]",
@@ -382,20 +382,8 @@
           "mgmtSubnetName": {
             "value": "[parameters('mgmtSubnetName')]"
           },
-          "mgmtSubnetAddressPrefix": {
-            "value": "[parameters('mgmtSubnetAddressPrefix')]"
-          },
           "intSubnetName": {
             "value": "[parameters('intSubnetName')]"
-          },
-          "intSubnetAddressPrefix": {
-            "value": "[parameters('intSubnetAddressPrefix')]"
-          },
-          "extSubnetName": {
-            "value": "[parameters('extSubnetName')]"
-          },
-          "extSubnetAddressPrefix": {
-            "value": "[parameters('extSubnetAddressPrefix')]"
           },
           "vnetExistingRGName": {
             "value": "[parameters('vnetExistingRGName')]"
