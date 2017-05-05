@@ -418,7 +418,7 @@
         },
         "parameters": {
           "f5NamePrefix": { "value": "[variables('f5NamePrefix')]" },
-          "instanceType": { "value": "parameters('instanceType')]" },
+          "instanceType": { "value": "[parameters('instanceType')]" },
           "mgmtIPAddress1": { "value": "[parameters('mgmtIPAddress1')]" },
           "mgmtIPAddress2": { "value": "[parameters('mgmtIPAddress2')]" },
           "intIPAddress1": { "value": "[parameters('intIPAddress1')]" },
