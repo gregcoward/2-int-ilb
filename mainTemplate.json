@@ -103,13 +103,6 @@
         "description": "Specify the virtual subnet name wher the BIG-IP will reside."
       }
     },
-    "mgmtSubnetAddressPrefix": {
-      "type": "string",
-      "defaultValue": "10.10.1.0/24",
-      "metadata": {
-        "description": "Specify the virtual subnet address space."
-      }
-    },
     "mgmtIPAddress1": {
       "type": "string",
       "metadata": {
