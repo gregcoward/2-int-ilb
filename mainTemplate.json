@@ -436,7 +436,6 @@
           "adminUsername": { "value": "[parameters('adminUsername')]" },
           "adminPassword": { "value": "[parameters('adminPassword')]" },
           "loadBalancerName": { "value": "[variables('loadbalancerName')]" },
-          "bigipNamePrefix": { "value": "[parameters('bigipNamePrefix')]" },
           "virtualNetworkName": { "value": "[parameters('vnetName')]" },
           "availabilitySetName": { "value": "[variables('availabilitySetName')]" },
           "newStorageAccountName": { "value": "[variables('newStorageAccountName')]" },
